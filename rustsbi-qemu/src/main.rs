@@ -197,18 +197,24 @@ fn set_pmp() {
     // pmp region 3: RWX, A=NAPOT, address range {0x8000_0000, 0x1000_0000}, VIRT_DRAM
     pmpcfg0 |= 0b11111 << 24;
     let pmpaddr3 = calc_pmpaddr(0x8000_0000, 0x1000_0000);
+    // pmp region 4: RW, A=NAPOT, address range {0x0010_0000, 0x00_2000}, VIRT_TEST/RTC
+    pmpcfg0 |= 0b11011 << 32;
+    let pmpaddr4 = calc_pmpaddr(0x0010_0000, 0x0000_2000);
+    
     unsafe {
         core::arch::asm!("csrw  pmpcfg0, {}",
              "csrw  pmpaddr0, {}",
              "csrw  pmpaddr1, {}",
              "csrw  pmpaddr2, {}",
              "csrw  pmpaddr3, {}",
+             "csrw  pmpaddr4, {}",
              "sfence.vma",
              in(reg) pmpcfg0,
              in(reg) pmpaddr0,
              in(reg) pmpaddr1,
              in(reg) pmpaddr2,
              in(reg) pmpaddr3,
+             in(reg) pmpaddr4,
         ); 
     }
 }
